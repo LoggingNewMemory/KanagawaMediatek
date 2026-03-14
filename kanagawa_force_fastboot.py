@@ -4,7 +4,6 @@ import sys
 import itertools
 import serial.tools.list_ports
 
-# ANSI Color Codes for Terminal UI
 class Colors:
     CYAN = '\033[96m'
     GREEN = '\033[92m'
@@ -35,12 +34,10 @@ def wait_for_mtk_device(vid=0x0E8D):
         ports = serial.tools.list_ports.comports()
         for p in ports:
             if p.vid == vid:
-                # Clear the spinner line
                 sys.stdout.write('\r' + ' ' * 20 + '\r')
                 print(f"{Colors.GREEN}[+] Detected MTK Device at {p.device} (VID: {hex(p.vid)} PID: {hex(p.pid)}){Colors.RESET}")
                 return p.device
                 
-        # Spinner animation
         sys.stdout.write(f'\r{Colors.CYAN}[{next(spinner)}] Scanning USB ports...{Colors.RESET}')
         sys.stdout.flush()
         time.sleep(0.1)
@@ -86,7 +83,7 @@ def force_fastboot(port_name):
         
     return success
 
-if __name__ == "__main__":
+def main():
     try:
         import serial
     except ImportError:
@@ -104,6 +101,8 @@ if __name__ == "__main__":
         time.sleep(0.3) 
         force_fastboot(port)
     except KeyboardInterrupt:
-        # Cleans up the output if you press Ctrl+C while the spinner is active
         print(f"\n\n{Colors.RED}[!] Process aborted by user.{Colors.RESET}")
         sys.exit(0)
+
+if __name__ == "__main__":
+    main()

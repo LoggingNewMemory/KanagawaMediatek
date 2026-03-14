@@ -5,7 +5,6 @@ import subprocess
 import itertools
 import os
 
-# ANSI Color Codes for Terminal UI
 class Colors:
     CYAN = '\033[96m'
     GREEN = '\033[92m'
@@ -27,7 +26,6 @@ def print_banner():
     print(banner)
 
 def run_command(cmd, show_error=False):
-    """Executes a shell command and returns the output."""
     try:
         stderr_target = None if show_error else subprocess.DEVNULL
         result = subprocess.check_output(cmd, shell=True, stderr=stderr_target)
@@ -61,7 +59,6 @@ def wait_for_adb():
         time.sleep(0.1)
 
 def extract_single_partition(partition_name):
-    """Handles the actual extraction of a specific partition string (e.g., 'boot_a')"""
     print(f"\n{Colors.CYAN}[*] Attempting to extract '{partition_name}'...{Colors.RESET}")
     
     target_path = f"/dev/block/by-name/{partition_name}"
@@ -94,18 +91,15 @@ def extract_single_partition(partition_name):
         return False
 
 def interactive_menu():
-    """Displays the menu and returns a list of exact partition names to extract."""
     partitions_ab = ["boot", "logo", "vbmeta", "init_boot", "lk", "tee", "scp", "dtbo"]
     partitions_single = ["nvram", "nvdata", "persist", "proinfo", "seccfg", "super"]
     
     print(f"{Colors.BOLD}--- Select Partition to Dump ---{Colors.RESET}")
     
-    # Print A/B Partitions
     print(f"{Colors.CYAN}A/B Partitions:{Colors.RESET}")
     for i, p in enumerate(partitions_ab, 1):
         print(f"  [{i}] {p} (a/b)")
         
-    # Print Single Partitions
     offset = len(partitions_ab)
     print(f"\n{Colors.CYAN}Single Partitions:{Colors.RESET}")
     for i, p in enumerate(partitions_single, offset + 1):
@@ -148,7 +142,7 @@ def interactive_menu():
 
     return targets
 
-if __name__ == "__main__":
+def main():
     print_banner()
     check_dependencies()
     
@@ -156,7 +150,6 @@ if __name__ == "__main__":
     print("1. Ensure device is booted normally (with Root) or in TWRP Recovery.")
     print("2. Connect via USB and ensure USB Debugging is authorized.\n")
     
-    # Run the menu before starting ADB to avoid background noise while typing
     targets_to_dump = interactive_menu()
     
     if not targets_to_dump:
@@ -171,10 +164,13 @@ if __name__ == "__main__":
         if wait_for_adb():
             for target in targets_to_dump:
                 extract_single_partition(target)
-                time.sleep(1) # Brief pause between multiple extractions
+                time.sleep(1)
                 
         run_command("adb kill-server")
     except KeyboardInterrupt:
         print(f"\n\n{Colors.RED}[!] Process aborted by user.{Colors.RESET}")
         run_command("adb kill-server")
         sys.exit(0)
+
+if __name__ == "__main__":
+    main()

@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 import os
 import sys
-import subprocess
+import time
+
+# Import your modules directly
+import kanagawa_adb_partition_extractor
+import kanagawa_force_fastboot
+import kanagawa_vbmeta_disabler
+import kanagawa_force_shutdown
 
 # ANSI Color Codes for Terminal UI
 class Colors:
@@ -13,7 +19,6 @@ class Colors:
     BOLD = '\033[1m'
 
 def clear_screen():
-    """Clears the terminal screen."""
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def print_main_banner():
@@ -28,19 +33,16 @@ def print_main_banner():
 {Colors.RESET}"""
     print(banner)
 
-def run_script(script_name):
-    """Executes a target python script and pauses when done."""
+def run_module(module_main_func):
+    """Executes the imported module's main function and pauses when done."""
     clear_screen()
-    if not os.path.exists(script_name):
-        print(f"{Colors.RED}[-] Error: '{script_name}' not found in the current directory.{Colors.RESET}")
-        input(f"\n{Colors.YELLOW}Press Enter to return to the main menu...{Colors.RESET}")
-        return
-
     try:
-        # Calls the script using the same Python executable running the menu
-        subprocess.call([sys.executable, script_name])
+        module_main_func()
     except KeyboardInterrupt:
-        print(f"\n{Colors.RED}[!] Script execution aborted by user.{Colors.RESET}")
+        print(f"\n{Colors.RED}[!] Execution aborted by user.{Colors.RESET}")
+    except SystemExit:
+        # Catches sys.exit() calls from the sub-scripts so the main menu doesn't close
+        pass
     except Exception as e:
         print(f"\n{Colors.RED}[-] An error occurred: {e}{Colors.RESET}")
         
@@ -62,13 +64,13 @@ def main_menu():
             choice = input(f"\n{Colors.CYAN}Enter your choice (0-4): {Colors.RESET}").strip()
             
             if choice == '1':
-                run_script("kanagawa_adb_partition_extractor.py")
+                run_module(kanagawa_adb_partition_extractor.main)
             elif choice == '2':
-                run_script("kanagawa_force_fastboot.py")
+                run_module(kanagawa_force_fastboot.main)
             elif choice == '3':
-                run_script("kanagawa_vbmeta_disabler.py")
+                run_module(kanagawa_vbmeta_disabler.main)
             elif choice == '4':
-                run_script("kanagawa_force_shutdown.py")
+                run_module(kanagawa_force_shutdown.main)
             elif choice == '0':
                 clear_screen()
                 print(f"{Colors.GREEN}[+] Exiting Kanagawa MediaTek Toolkit. Goodbye!{Colors.RESET}")
@@ -83,5 +85,4 @@ def main_menu():
             sys.exit(0)
 
 if __name__ == "__main__":
-    import time # Imported here just for the invalid choice sleep
     main_menu()

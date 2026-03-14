@@ -6,7 +6,6 @@ import itertools
 import os
 import urllib.request
 
-# ANSI Color Codes for Terminal UI
 class Colors:
     CYAN = '\033[96m'
     GREEN = '\033[92m'
@@ -51,7 +50,6 @@ def check_dependencies():
         print(f"{Colors.GREEN}[+] fastboot and adb verified.{Colors.RESET}\n")
 
 def try_adb_reboot_bootloader():
-    """Checks for a device in Android via ADB and reboots it to the bootloader."""
     print(f"{Colors.CYAN}[*] Checking for devices connected via ADB...{Colors.RESET}")
     output = run_command("adb devices", show_output=False)
     
@@ -153,14 +151,16 @@ def disable_avb(img_path):
     if reboot != 'n':
         run_command("fastboot reboot")
 
-if __name__ == "__main__":
+def main():
     print_banner()
     check_dependencies()
     
-    # Check for ADB devices and trigger a reboot if found
     try_adb_reboot_bootloader()
     
     img_target = get_vbmeta_image()
     
     if wait_for_fastboot():
         disable_avb(img_target)
+
+if __name__ == "__main__":
+    main()
