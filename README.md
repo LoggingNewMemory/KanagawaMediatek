@@ -16,7 +16,7 @@ A powerful, all-in-one Terminal User Interface (TUI) toolkit designed specifical
 
 ## 🛠️ Prerequisites
 
-Before using the compiled toolkit or building it yourself, ensure your Linux system has the standard Android platform tools installed:
+Before using the toolkit, ensure your Linux system has the standard Android platform tools installed:
 
 * **ADB (Android Debug Bridge)**
 * **Fastboot**
@@ -25,15 +25,16 @@ Before using the compiled toolkit or building it yourself, ensure your Linux sys
 
 ---
 
-## ⚙️ How to Build (Linux)
+## 💻 How to Use (Download & Run)
 
-To compile the Python scripts into a single, portable executable binary, use the provided build script. It safely uses a Python virtual environment to comply with modern Linux package managers (PEP 668).
+The easiest way to use this toolkit is to download the pre-compiled binary. 
 
-1. Ensure Python 3 is installed (`sudo pacman -S python`).
-2. Make the build script executable:
+1. Go to the [Kanagawa Mediatek Releases Page](https://github.com/LoggingNewMemory/KanagawaMediatek/releases) and download the latest `kanagawa_toolkit` binary.
+2. Open your terminal and navigate to the folder where you downloaded the file (for example: `cd ~/Downloads`).
+3. Grant execution permissions to the file using `chmod`:
    ```bash
-   chmod +x build.sh
-    
+   chmod +x kanagawa_toolkit
+4. Run it ```./kanagawa_toolkit```
 
 Support Me: <br />
 https://sociabuzz.com/kanagawa_yamada/tribe (Global) <br />
