@@ -2,7 +2,6 @@
 import time
 import sys
 import itertools
-import subprocess
 import serial.tools.list_ports
 
 class Colors:
@@ -21,26 +20,9 @@ def print_banner():
  | . \ (_| | | | | (_| | (_| | (_| |\ V  V / (_| |
  |_|\_\__,_|_| |_|\__,_|\__, |\__,_| \_/\_/ \__,_|
                         |___/                     
-   Force FastbootD Utility | MTK Preloader -> FastbootD
+       Force Fastboot Utility | MTK Preloader     
 {Colors.RESET}"""
     print(banner)
-
-def run_command(cmd):
-    try:
-        result = subprocess.check_output(cmd, shell=True, stderr=subprocess.DEVNULL)
-        return result.decode('utf-8').strip()
-    except subprocess.CalledProcessError:
-        return ""
-
-def check_dependencies():
-    print(f"{Colors.CYAN}[*] Checking dependencies...{Colors.RESET}")
-    
-    fastboot_check = run_command("fastboot --version")
-    if not fastboot_check:
-        print(f"{Colors.RED}[-] Fastboot command not found in system PATH. Please install Android Platform Tools.{Colors.RESET}")
-        sys.exit(1)
-        
-    print(f"{Colors.GREEN}[+] Dependencies verified.{Colors.RESET}\n")
 
 def wait_for_mtk_device(vid=0x0E8D):
     print(f"{Colors.YELLOW}[*] Waiting for MediaTek Preloader VCOM port to appear...{Colors.RESET}")
@@ -101,28 +83,6 @@ def force_fastboot(port_name):
         
     return success
 
-def wait_for_fastboot_device(timeout=30):
-    print(f"{Colors.YELLOW}[*] Waiting for device to boot into Bootloader and be detected by Fastboot...{Colors.RESET}")
-    
-    start_time = time.time()
-    spinner = itertools.cycle(['|', '/', '-', '\\'])
-    
-    while time.time() - start_time < timeout:
-        fastboot_output = run_command("fastboot devices")
-        if fastboot_output:
-            lines = [line.strip() for line in fastboot_output.split('\n') if line.strip()]
-            if lines:
-                sys.stdout.write('\r' + ' ' * 60 + '\r')
-                print(f"{Colors.GREEN}[+] Fastboot Device Detected: {lines[0]}{Colors.RESET}")
-                return True
-        sys.stdout.write(f'\r{Colors.CYAN}[{next(spinner)}] Polling for Fastboot interface...{Colors.RESET}')
-        sys.stdout.flush()
-        time.sleep(0.5)
-        
-    sys.stdout.write('\r' + ' ' * 60 + '\r')
-    print(f"{Colors.RED}[-] Timeout waiting for Fastboot device.{Colors.RESET}")
-    return False
-
 def main():
     try:
         import serial
@@ -131,7 +91,6 @@ def main():
         sys.exit(1)
         
     print_banner()
-    check_dependencies()
     
     print(f"{Colors.BOLD}Instructions:{Colors.RESET}")
     print("1. Power off your phone (or let it bootloop).")
@@ -140,15 +99,7 @@ def main():
     try:
         port = wait_for_mtk_device()
         time.sleep(0.3) 
-        if force_fastboot(port):
-            if wait_for_fastboot_device():
-                print(f"{Colors.YELLOW}[*] Sending 'fastboot reboot fastboot' command...{Colors.RESET}")
-                output = run_command("fastboot reboot fastboot")
-                if output:
-                    print(f"{Colors.GREEN}[>] Command output: {output}{Colors.RESET}")
-                print(f"{Colors.GREEN}{Colors.BOLD}[+] Successfully requested reboot to FastbootD!{Colors.RESET}")
-            else:
-                print(f"{Colors.RED}[-] Could not auto-reboot: Fastboot device not found after handshake.{Colors.RESET}")
+        force_fastboot(port)
     except KeyboardInterrupt:
         print(f"\n\n{Colors.RED}[!] Process aborted by user.{Colors.RESET}")
         sys.exit(0)
