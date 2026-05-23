@@ -7,6 +7,7 @@ import time
 import kanagawa_adb_partition_extractor
 import kanagawa_force_bootloader
 import kanagawa_force_fastboot
+import kanagawa_force_recovery
 import kanagawa_vbmeta_disabler
 import kanagawa_force_shutdown
 
@@ -58,12 +59,13 @@ def main_menu():
         print(f"  {Colors.GREEN}[1]{Colors.RESET} Extract Partitions (Root/TWRP ADB)")
         print(f"  {Colors.GREEN}[2]{Colors.RESET} Force Bootloader Mode (MTK Preloader)")
         print(f"  {Colors.GREEN}[3]{Colors.RESET} Force FastbootD Mode (MTK Preloader -> FastbootD)")
-        print(f"  {Colors.GREEN}[4]{Colors.RESET} Disable VBMeta / AVB Patcher")
-        print(f"  {Colors.GREEN}[5]{Colors.RESET} Force Shutdown (ADB/Fastboot)")
+        print(f"  {Colors.GREEN}[4]{Colors.RESET} Force Recovery Mode (MTK Preloader -> Recovery)")
+        print(f"  {Colors.GREEN}[5]{Colors.RESET} Disable VBMeta / AVB Patcher")
+        print(f"  {Colors.GREEN}[6]{Colors.RESET} Force Shutdown (ADB/Fastboot)")
         print(f"\n  {Colors.RED}[0]{Colors.RESET} Exit Toolkit")
         
         try:
-            choice = input(f"\n{Colors.CYAN}Enter your choice (0-5): {Colors.RESET}").strip()
+            choice = input(f"\n{Colors.CYAN}Enter your choice (0-6): {Colors.RESET}").strip()
             
             if choice == '1':
                 run_module(kanagawa_adb_partition_extractor.main)
@@ -72,8 +74,10 @@ def main_menu():
             elif choice == '3':
                 run_module(kanagawa_force_fastboot.main)
             elif choice == '4':
-                run_module(kanagawa_vbmeta_disabler.main)
+                run_module(kanagawa_force_recovery.main)
             elif choice == '5':
+                run_module(kanagawa_vbmeta_disabler.main)
+            elif choice == '6':
                 run_module(kanagawa_force_shutdown.main)
             elif choice == '0':
                 clear_screen()
